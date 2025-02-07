@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Previsão de Preço</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Previsão de Preço de Aluguel</h1>
+    <form action="/predict" method="post">
+        <label>Bairro Group:</label>
+        <input type="text" name="bairro_group"><br>
+        <label>Bairro:</label>
+        <input type="text" name="bairro"><br>
+        <label>Latitude:</label>
+        <input type="text" name="latitude"><br>
+        <label>Longitude:</label>
+        <input type="text" name="longitude"><br>
+        <label>Tipo de Quarto:</label>
+        <input type="text" name="room_type"><br>
+        <label>Mínimo de Noites:</label>
+        <input type="number" name="minimo_noites"><br>
+        <label>Disponibilidade (dias):</label>
+        <input type="number" name="disponibilidade_365"><br>
+        <button type="submit">Prever</button>
+    </form>
+    {% if prediction %}
+        <h2>Preço Previsto: {{ prediction }}</h2>
+    {% endif %}
+</body>
+</html>
