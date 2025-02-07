@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <h1 align="center">🏠 Indicium Price Predictor 🏠</h1>
 
 <p align="center">
@@ -125,10 +124,3 @@ O modelo utiliza um pipeline que inclui:
    - O desempenho do modelo é avaliado usando RMSE (Root Mean Squared Error).
 
 ---
-
-<p align="center">
-  🌟 <strong>Desenvolvido para simplificar a precificação de aluguéis temporários e fornecer insights valiosos para o negócio!</strong> 🌟
-</p>
-=======
-
->>>>>>> 709c8d9ad5f0a4f619f15d7afad4d2ad3cd3d566
