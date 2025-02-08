@@ -60,6 +60,30 @@ scikit-learn == 1.6.1
 matplotlib == 3.7.2
 seaborn == 0.12.2
 flask == 2.3.2
+blinker==1.9.0
+click==8.1.8
+colorama==0.4.6
+contourpy==1.3.1
+cycler==0.12.1
+Flask==3.1.0
+fonttools==4.56.0
+itsdangerous==2.2.0
+Jinja2==3.1.5
+kiwisolver==1.4.8
+MarkupSafe==3.0.2
+matplotlib==3.10.0
+numpy==2.2.2
+packaging==24.2
+pandas==2.2.3
+pillow==11.1.0
+pyparsing==3.2.1
+python-dateutil==2.9.0.post0
+pytz==2025.1
+seaborn==0.13.2
+six==1.17.0
+tzdata==2025.1
+Werkzeug==3.1.3
+
 ```
 
 Você pode instalar todas as dependências usando o arquivo `requirements.txt` fornecido no repositório.
