@@ -28,8 +28,6 @@
 - **Modelagem Preditiva**: Desenvolver um modelo capaz de prever o preço de aluguel com base nas características do imóvel.
 - **Validação do Modelo**: Avaliar a performance do modelo utilizando métricas como RMSE (Root Mean Squared Error).
 - **API Flask**: Criar uma interface simples para prever preços a partir de novos dados inseridos pelo usuário.
-- **Entrega Final**: Organizar o projeto em um repositório público com documentação clara e instruções de instalação.
-
 ---
 
 <h2 align="center">🎮 Funcionalidades Principais 🎮</h2>
@@ -101,6 +99,10 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
    ```bash
    python -m venv venv
    source venv/bin/activate  # No Windows: venv\Scripts\activate
+   # lembre-se de permitir o uso de Scripts
+      - Abra o PowerShell como administrador;
+      - Então cole no terminal -> "Set-ExecutionPolicy RemoteSigned -Scope LocalMachine";
+      - Em seguida digite S(Y) para concordar.
    ```
 
 3. **Instale as Dependências**:
@@ -109,7 +111,7 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
    ```
 
 4. **Treine o Modelo**:
-   - Execute o notebook `notebooks/model_training.ipynb` para treinar e salvar o modelo (`model.pkl`).
+   - Execute o notebook `notebooks/treinamento_modelo.ipynb` para treinar e salvar o modelo (`model.pkl`).
 
 5. **Execute a API Flask**:
    - Inicie a API Flask com o seguinte comando:
