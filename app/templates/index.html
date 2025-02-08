@@ -5,95 +5,66 @@
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    
-    <h1>Previsão de Preço de Aluguel</h1>
-    <form action="/predict" method="post">
-        <!-- <label>Bairro Group:</label>
-        <input type="text" name="bairro_group"><br>
-        <label>Bairro:</label>
-        <input type="text" name="bairro"><br>
-        <label>Latitude:</label>
-        <input type="text" name="latitude"><br>
-        <label>Longitude:</label>
-        <input type="text" name="longitude"><br>
-        <label>Tipo de Quarto:</label>
-        <input type="text" name="room_type"><br>
-        <label>Mínimo de Noites:</label>
-        <input type="number" name="minimo_noites"><br>
-        <label>Disponibilidade (dias):</label>
-        <input type="number" name="disponibilidade_365"><br>
-        <label>numero de reviews:</label>
-        <input type="number" name="numero_de_reviews"><br>
-        <label>host listing:</label>
-        <input type="number" name="calculado_host_listings_count"><br>
-        <label>reviews por mês:</label>
-        <input type="number" name="reviews_por_mes"><br> -->
+    <h1></h1>
+
+    <!-- Barra de Pesquisa -->
+    <section style="margin-top: 50px;">
+        <div class="grid"></div>
+        <div id="poda">
+            <div class="glow"></div>
+            <div class="darkBorderBg"></div>
+            <div class="darkBorderBg"></div>
+            <div class="darkBorderBg"></div>
+            <div class="white"></div>
+            <div class="border"></div>
+            <div id="main">
+                <input placeholder="Search Hotel" type="text" id="searchInput" class="input" />
+                <div id="input-mask"></div>
+                <div id="pink-mask"></div>
+                <div class="filterBorder"></div>
+                <div id="filter-icon">
+                    <svg preserveAspectRatio="none" height="27" width="27" viewBox="4.8 4.56 14.832 15.408" fill="none">
+                        <path d="M8.16 6.65002H15.83C16.47 6.65002 16.99 7.17002 16.99 7.81002V9.09002C16.99 9.56002 16.7 10.14 16.41 10.43L13.91 12.64C13.56 12.93 13.33 13.51 13.33 13.98V16.48C13.33 16.83 13.1 17.29 12.81 17.47L12 17.98C11.24 18.45 10.2 17.92 10.2 16.99V13.91C10.2 13.5 9.97 12.98 9.73 12.69L7.52 10.36C7.23 10.08 7 9.55002 7 9.20002V7.87002C7 7.17002 7.52 6.65002 8.16 6.65002Z" stroke="#d6d6e6" stroke-width="1" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </div>
+                <div id="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" height="24" fill="none" class="feather feather-search">
+                        <circle stroke="url(#search)" r="8" cy="11" cx="11"></circle>
+                        <line stroke="url(#searchl)" y2="16.65" y1="22" x2="16.65" x1="22"></line>
+                        <defs>
+                            <linearGradient gradientTransform="rotate(50)" id="search">
+                                <stop stop-color="#f8e7f8" offset="0%"></stop>
+                                <stop stop-color="#b6a9b7" offset="0%"></stop>
+                            </linearGradient>
+                            <linearGradient id="searchl">
+                                <stop stop-color="#b6a9b7" offset="0%"></stop>
+                                <stop stop-color="#837484" offset="0%"></stop>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
 
 
-        <div class="input-container">
-    <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="bairro_group">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-    <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="bairro">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-    <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="latitude">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="longitude">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="room_type">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="minimo_noites">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="disponibilidade_365">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="numero_de_reviews">
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="calculado_host_listings_count"> 
-    <button class="button">Add</button>
-</div>
-<div class="input-container">
-        <label>Bairro Group:</label>
-    <input placeholder="Add Item" type="text" name="reviews_por_mes">
-    <button class="button">Add</button>
-</div>
+    <div id="searchResults" style="margin-top: 20px;"></div>
 
-
-
-
-        <button class="btn-17">
+    <div id="selectedData" style="margin-top: 20px; display: none;">
+        <h2>Dados Selecionados</h2>
+        <ul id="selectedDataList"></ul>
+        <button id="predictButton" class="btn-17">
             <span class="text-container">
-              <span class="text" type="submit">Prever</span>
+                <span class="text">Prever</span>
             </span>
         </button>
-    </form>
+    </div>
+
+    <!-- Exibir Previsão -->
     {% if prediction %}
         <h2>Preço Previsto: {{ prediction }}</h2>
     {% endif %}
+
+    <script src="../static/script.js"></script>
 </body>
 </html>
-
-
