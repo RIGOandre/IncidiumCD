@@ -2,12 +2,13 @@
 <html>
 <head>
     <title>Previsão de Preço</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+    
     <h1>Previsão de Preço de Aluguel</h1>
     <form action="/predict" method="post">
-        <label>Bairro Group:</label>
+        <!-- <label>Bairro Group:</label>
         <input type="text" name="bairro_group"><br>
         <label>Bairro:</label>
         <input type="text" name="bairro"><br>
@@ -21,10 +22,78 @@
         <input type="number" name="minimo_noites"><br>
         <label>Disponibilidade (dias):</label>
         <input type="number" name="disponibilidade_365"><br>
-        <button type="submit">Prever</button>
+        <label>numero de reviews:</label>
+        <input type="number" name="numero_de_reviews"><br>
+        <label>host listing:</label>
+        <input type="number" name="calculado_host_listings_count"><br>
+        <label>reviews por mês:</label>
+        <input type="number" name="reviews_por_mes"><br> -->
+
+
+        <div class="input-container">
+    <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="bairro_group">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+    <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="bairro">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+    <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="latitude">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="longitude">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="room_type">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="minimo_noites">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="disponibilidade_365">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="numero_de_reviews">
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="calculado_host_listings_count"> 
+    <button class="button">Add</button>
+</div>
+<div class="input-container">
+        <label>Bairro Group:</label>
+    <input placeholder="Add Item" type="text" name="reviews_por_mes">
+    <button class="button">Add</button>
+</div>
+
+
+
+
+        <button class="btn-17">
+            <span class="text-container">
+              <span class="text" type="submit">Prever</span>
+            </span>
+        </button>
     </form>
     {% if prediction %}
         <h2>Preço Previsto: {{ prediction }}</h2>
     {% endif %}
 </body>
 </html>
+
+

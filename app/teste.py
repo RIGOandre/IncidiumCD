@@ -18,7 +18,7 @@ print(df.isnull().sum())
 
 # distribuição de preços
 plt.figure(figsize=(10, 6))
-sns.histplot(df['price'], bins=50, kde=True, color='blue')
+sns.histplot(df['price'], bins=50, kde=True, color='black')
 plt.title('Distribuição dos Preços')
 plt.xlabel('Preço')
 plt.ylabel('Frequência')
