@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Previsão de Preço</title>
+    <title>New York</title>
     <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-    <h1></h1>
+    
+    <h1 id="dynamicText"> Find the perfect place for you </h1>
+
+
+      
 
     <!-- Barra de Pesquisa -->
     <section style="margin-top: 50px;">
-        <div class="grid"></div>
+        <div class="grid" id="brpq"></div>
         <div id="poda">
             <div class="glow"></div>
             <div class="darkBorderBg"></div>
             <div class="darkBorderBg"></div>
             <div class="darkBorderBg"></div>
-            <div class="white"></div>
-            <div class="border"></div>
             <div id="main">
                 <input placeholder="Search Hotel" type="text" id="searchInput" class="input" />
                 <div id="input-mask"></div>
@@ -51,7 +53,7 @@
     <div id="searchResults" style="margin-top: 20px;"></div>
 
     <div id="selectedData" style="margin-top: 20px; display: none;">
-        <h2>Dados Selecionados</h2>
+        <h2 style="text-align: center; margin-bottom: 20px;" >Dados Selecionados</h2>
         <ul id="selectedDataList"></ul>
         <button id="predictButton" class="btn-17">
             <span class="text-container">

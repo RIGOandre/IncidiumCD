@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Exibir resultados
             searchResults.innerHTML = "";
             if (results.length === 0) {
-                searchResults.innerHTML = "<div>No results found.</div>";
+                searchResults.innerHTML = "<div> No results found. </div>";
                 return;
             }
 
@@ -78,3 +78,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
