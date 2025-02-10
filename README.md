@@ -1,8 +1,7 @@
 <h1 align="center">🏠 Indicium Price Predictor 🏠</h1>
 
 <p align="center">
-  <strong>Um modelo preditivo para prever preços de aluguéis temporários em Nova York! 🌆</strong>
-</p>
+  <strong>Um modelo preditivo para prever preços de aluguéis temporários em Nova York! 🌆</strong></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.13-blue" alt="Python Badge">
