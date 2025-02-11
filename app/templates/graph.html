@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            align-items: center;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 30px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+
+        }
+        a{
+            font-size: 1.6em;
+            text-decoration: underline;
+            color: rgb(0, 4, 250);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <a href="/">home</a>
+    <h1>Distribuição de Preços</h1>
+    <img id="price_distribution" alt="Distribuição de Preços">
+
+    <h1>Preço Médio por Bairro</h1>
+    <img id="avg_price_by_neighborhood" alt="Preço Médio por Bairro">
+
+    <h1>Matriz de Correlação</h1>
+    <img id="correlation_matrix" alt="Matriz de Correlação">
+
+    <h1>Relação entre Tipo de Quarto e Preço</h1>
+    <img id="room_type_vs_price" alt="Relação entre Tipo de Quarto e Preço">
+
+    <h1>Relação entre Mínimo de Noites, Disponibilidade e Preço</h1>
+    <img id="min_nights_vs_price" alt="Relação entre Mínimo de Noites, Disponibilidade e Preço">
+
+    <h1>Boxplot dos Preços (Outliers)</h1>
+    <img id="price_boxplot" alt="Boxplot dos Preços">
+
+    <h1>Distribuição de Reviews por Mês</h1>
+    <img id="reviews_per_month" alt="Distribuição de Reviews por Mês">
+
+    <h1>Top 10 Hosts com Mais Listagens</h1>
+    <img id="top_hosts" alt="Top 10 Hosts com Mais Listagens">
+
+    <script>
+        fetch('/generate_charts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar as imagens com os dados recebidos
+            document.getElementById('price_distribution').src = `data:image/png;base64,${data.price_distribution}`;
+            document.getElementById('avg_price_by_neighborhood').src = `data:image/png;base64,${data.avg_price_by_neighborhood}`;
+            document.getElementById('correlation_matrix').src = `data:image/png;base64,${data.correlation_matrix}`;
+            document.getElementById('room_type_vs_price').src = `data:image/png;base64,${data.room_type_vs_price}`;
+            document.getElementById('min_nights_vs_price').src = `data:image/png;base64,${data.min_nights_vs_price}`;
+            document.getElementById('price_boxplot').src = `data:image/png;base64,${data.price_boxplot}`;
+            document.getElementById('reviews_per_month').src = `data:image/png;base64,${data.reviews_per_month}`;
+            document.getElementById('top_hosts').src = `data:image/png;base64,${data.top_hosts}`;
+        })
+        .catch(error => {
+            console.error('Erro ao carregar gráficos:', error);
+        });
+    </script>
+</body>
+</html>

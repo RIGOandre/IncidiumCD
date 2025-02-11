@@ -1,29 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("searchInput");
     const searchResults = document.getElementById("searchResults");
-    const selectedData = document.getElementById("selectedData");
-    const selectedDataList = document.getElementById("selectedDataList");
+    const popup = document.getElementById("popup");
+    const closePopup = document.getElementById("closePopup");
+    const popupDataList = document.getElementById("popupDataList");
     const predictButton = document.getElementById("predictButton");
 
     let selectedHotel = null;
 
-    // buscar hotéis
+    // Função para buscar hotéis
     searchInput.addEventListener("input", async (event) => {
-        const query = event.target.value.trim().toLowerCase(); // Converte a consulta para minúsculas
+        const query = event.target.value.trim().toLowerCase();
         if (!query) {
             searchResults.innerHTML = "";
             return;
         }
 
         try {
-            // requisição Flask
             const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
             const results = await response.json();
 
-            // Exibir resultados
             searchResults.innerHTML = "";
             if (results.length === 0) {
-                searchResults.innerHTML = "<div> No results found. </div>";
+                searchResults.innerHTML = "<div>No results found.</div>";
                 return;
             }
 
@@ -33,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 div.style.cursor = "pointer";
                 div.addEventListener("click", () => {
                     selectedHotel = hotel;
-                    displaySelectedData(hotel);
+                    openPopup(hotel);
                 });
                 searchResults.appendChild(div);
             });
@@ -42,26 +41,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // exibir dados 
-    function displaySelectedData(hotel) {
-        selectedData.style.display = "block";
-        selectedDataList.innerHTML = "";
+    // Abrir o pop-up
+    function openPopup(hotel) {
+        popupDataList.innerHTML = ""; // Limpa o conteúdo anterior
 
         for (const [key, value] of Object.entries(hotel)) {
+            const formattedKey = key
+                .replace(/_/g, " ")
+                .split(" ")
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ");
+
             const listItem = document.createElement("li");
-            listItem.textContent = `${key}: ${value}`;
-            selectedDataList.appendChild(listItem);
+            listItem.textContent = `${formattedKey}: ${value}`;
+            popupDataList.appendChild(listItem);
         }
+
+        popup.style.display = "block"; // Mostra o pop-up
     }
 
-    //  dados para previsão
-    predictButton.addEventListener("click", () => {
+    // Fechar o pop-up com confirmação de preço
+    closePopup.addEventListener("click", () => {
         if (!selectedHotel) {
             alert("Selecione um hotel primeiro.");
             return;
         }
 
-        //  dados ao servidor Flask
+        // Enviar dados para previsão
         fetch("/predict", {
             method: "POST",
             headers: {
@@ -71,11 +77,83 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(response => response.json())
         .then(data => {
-            alert(`Preço Previsto: ${data.prediction}`);
+            // confirmação de preço  SweetAlert2
+            Swal.fire({
+                title: `<strong>The Expected Price Is ${data.prediction}</strong>`,
+                icon: "success",
+                html: `
+                   <h4>What do you think about this price? </h4>
+                `,
+                showCloseButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: `
+                  <i class="fa fa-thumbs-up"></i> Great!
+                `,
+                confirmButtonAriaLabel: "Thumbs up, great!",
+                cancelButtonText: `
+                Not Great!
+                `,
+            }).then((result) => {
+                closeAllPopups();
+            });
         })
         .catch(error => {
             console.error("Erro ao enviar dados:", error);
         });
     });
-});
 
+    // Fechar o pop-up ao clicar fora 
+    window.addEventListener("click", (event) => {
+        if (event.target === popup) {
+            popup.style.display = "none";
+        }
+    });
+
+    // Enviar dados para previsão
+    predictButton.addEventListener("click", () => {
+        if (!selectedHotel) {
+            alert("Selecione um hotel primeiro.");
+            return;
+        }
+
+        fetch("/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(selectedHotel)
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: `<strong>The Expected Price Is ${data.prediction}</strong>`,
+                icon: "success",
+                html: `
+                   <h4>What do you think about this price? </h4>
+                `,
+                showCloseButton: true,
+
+                focusConfirm: false,
+                confirmButtonText: `
+                  <i class="fa fa-thumbs-up"></i> Great!
+                `,
+                confirmButtonAriaLabel: "Thumbs up, great!",
+
+                
+            }).then((result) => {
+
+                closeAllPopups();
+            });
+        })
+        .catch(error => {
+            console.error("Erro ao enviar dados:", error);
+        });
+    });
+
+    function closeAllPopups() {
+        popup.style.display = "none";
+
+        Swal.close();
+    }
+});
