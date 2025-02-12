@@ -109,6 +109,9 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
 
 4. **Treine o Modelo**:
    - Execute o notebook `notebooks/treinamento_modelo.py` para treinar e salvar o modelo (`model.pkl`).
+   -   lembre-se de trocar as rotas pelo seu PATH `df = pd.read_csv(r'C:\Users\manoa\Documents\GitHub\IncidiumCD\data\teste_indicium_precificacao.csv')` 
+   -   
+   - O treinamento pode levar de 5 a 10 minutos (dependendo do poder computacional)
 
 5. **Execute a API Flask**:
    - Inicie a API Flask com o seguinte comando:
