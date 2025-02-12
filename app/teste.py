@@ -156,3 +156,5 @@ sns.scatterplot(data=df, x='minimo_noites', y='price', hue='disponibilidade_365'
 plt.title('Relação entre Mínimo de Noites, Disponibilidade e Preço')
 plt.show()
 
+
+

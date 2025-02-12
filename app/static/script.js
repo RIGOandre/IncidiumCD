@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let selectedHotel = null;
 
-    // Função para buscar hotéis
+    //  buscar 
     searchInput.addEventListener("input", async (event) => {
         const query = event.target.value.trim().toLowerCase();
         if (!query) {
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             Swal.fire({
-                title: `<strong>The Expected Price Is ${data.prediction}</strong>`,
+                title: `<strong>The expected price is ${data.prediction}</strong>`,
                 icon: "success",
                 html: `
                    <h4>What do you think about this price? </h4>

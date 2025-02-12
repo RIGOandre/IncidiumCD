@@ -404,32 +404,13 @@ body{
 }
 
 
-#selectedDataList {
-  list-style-type: none;
-  padding: 0;
-}
-
-#selectedDataList li {
-  font-size: 1.2em;
-  color: #000000;
-  text-align: center;
-}
-
- #selectedDataList{ /* fazer card/pop-up e organizar pré lista */
-  background-color: rgba(252, 252, 252, 0.164);
-  width: fit-content;
-  margin-top: 100px;
-  border-radius: 10px;
-}
-
-
 
 
 #searchResults div {
   padding: 10px;
   margin-bottom: 5px;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  background-color: #ffffff00;
+  width: fit-content;
   border-radius: 4px;
   cursor: pointer;
   text-align: center;
@@ -437,6 +418,7 @@ body{
 
 #searchResults div:hover {
   background-color: #f7f7f7;
+  transform:scale(1.1);
 }
 
 /* Pop-up */
@@ -456,16 +438,14 @@ body{
   background-color: #fff;
   margin: 10% auto;
   padding: 20px;
-  border: 1px solid #888;
   width: 80%;
   max-width: 600px;
   border-radius: 10px;
-  position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .close {
-  color: #aaa;
+  color: #9c9c9c;
   float: right;
   font-size: 28px;
   font-weight: bold;
