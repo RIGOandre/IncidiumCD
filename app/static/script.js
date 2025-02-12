@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let selectedHotel = null;
 
-    //  buscar 
+    //  buscar hotéis
     searchInput.addEventListener("input", async (event) => {
         const query = event.target.value.trim().toLowerCase();
         if (!query) {

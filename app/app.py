@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # Define o backend para 'Agg'
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
@@ -13,6 +13,7 @@ import base64
 import threading
 import tkinter as tk
 from matplotlib.ticker import MaxNLocator
+import math 
 
 app = Flask(__name__)
 
@@ -39,11 +40,18 @@ try:
 except Exception as e:
     raise RuntimeError(f"Erro ao carregar o CSV: {e}")
 
-# Tratar valores nulos na coluna 'nome'
+# Tratar valores nulos na colun 'nome'
 data['nome'] = data['nome'].fillna('').str.lower()
 data = data.set_index('nome', drop=False)
 print("Dados carregados com sucesso:")
 print(data.head())
+
+#informativo
+top_10_prices = data.nlargest(10, 'price')
+result = top_10_prices[['host_name', 'price', 'bairro']]
+print("Os 10 maiores preços e os hotéis correspondentes:")
+print(result)
+
 
 # Função para salvar gráficos como Base64
 def save_plot_as_base64():
@@ -58,7 +66,6 @@ def save_plot_as_base64():
 def generate_price_distribution():
     plt.figure(figsize=(12, 6))
     sns.histplot(data['price'], bins=50, kde=True, color='black')
-    # plt.title('Distribuição dos Preços')
     plt.xlabel('Preço')
     plt.ylabel('Frequência')
     return save_plot_as_base64()
@@ -66,65 +73,49 @@ def generate_price_distribution():
 # Preço Médio por Bairro
 def generate_avg_price_by_neighborhood():
     avg_price_by_neighborhood = data.groupby('bairro')['price'].mean().sort_values(ascending=False)
-    
-    # Filtrar rótulos (opcional)
-    indices_filtrados = avg_price_by_neighborhood.index[::2]  # Exibe a cada 2 bairros
+    indices_filtrados = avg_price_by_neighborhood.index[::2]
     valores_filtrados = avg_price_by_neighborhood.values[::2]
-    
-    plt.figure(figsize=(25, 12))  
+    plt.figure(figsize=(25, 12))
     sns.barplot(x=indices_filtrados, y=valores_filtrados, palette='viridis', width=0.5)
-    
     plt.xticks(rotation=90)
-    # plt.title('Preço Médio por Bairro', fontsize=34)
     plt.xlabel('Bairro', fontsize=24)
     plt.ylabel('Preço Médio', fontsize=24)
-    
-    # Ajustar o tamanho da fonte e o espaçamento
-    plt.tick_params(axis='both', labelsize=18, pad=20) 
+    plt.tick_params(axis='both', labelsize=18, pad=20)
     plt.tight_layout()
     plt.margins(x=0.01)
-    plt.subplots_adjust(bottom=0.4)  
-    
+    plt.subplots_adjust(bottom=0.4)
     return save_plot_as_base64()
 
 # Matriz de Correlação
-
 def generate_correlation_matrix():
     numeric_features = ['latitude', 'longitude', 'price', 'minimo_noites', 'numero_de_reviews',
                         'reviews_por_mes', 'calculado_host_listings_count', 'disponibilidade_365']
     correlation_matrix = data[numeric_features].corr()
     plt.figure(figsize=(10, 10))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
-    # plt.title('Matriz de Correlação entre Variáveis Numéricas')
-    plt.subplots_adjust(bottom=0.4,left=0.3)
+    plt.subplots_adjust(bottom=0.4, left=0.3)
     return save_plot_as_base64()
 
 # Relação entre Tipo de Quarto e Preço
-
 def generate_room_type_vs_price():
     plt.figure(figsize=(10, 6))
     sns.boxplot(data=data, x='room_type', y='price', palette='Set2')
-    # plt.title('Relação entre Tipo de Quarto e Preço')
     plt.xlabel('Tipo de Quarto')
     plt.ylabel('Preço')
     return save_plot_as_base64()
 
 # Relação entre Mínimo de Noites, Disponibilidade e Preço
-
 def generate_min_nights_vs_price():
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=data, x='minimo_noites', y='price', hue='disponibilidade_365', palette='viridis')
-    # plt.title('Relação entre Mínimo de Noites, Disponibilidade e Preço')
     plt.xlabel('Mínimo de Noites')
     plt.ylabel('Preço')
     return save_plot_as_base64()
 
 # Boxplot dos Preços (Outliers)
-
 def generate_price_boxplot():
     plt.figure(figsize=(10, 6))
     sns.boxplot(data['price'], color='orange')
-    # plt.title('Boxplot dos Preços')
     plt.xlabel('Preço')
     return save_plot_as_base64()
 
@@ -132,7 +123,6 @@ def generate_price_boxplot():
 def generate_reviews_per_month():
     plt.figure(figsize=(14, 6))
     sns.histplot(data['reviews_por_mes'], bins=60, kde=True, color='green')
-    # plt.title('Distribuição de Reviews por Mês')
     plt.xlabel('Reviews por Mês')
     plt.ylabel('Frequência')
     return save_plot_as_base64()
@@ -149,7 +139,6 @@ def generate_top_hosts():
 
 # Índice de Rentabilidade por Bairro
 def generate_rentability_index():
-    # Calcular o índice de rentabilidade: preço médio / disponibilidade média
     rentability_index = (
         data.groupby('bairro')
         .agg({'price': 'mean', 'disponibilidade_365': 'mean'})
@@ -157,65 +146,84 @@ def generate_rentability_index():
     )
     rentability_index['rentability_index'] = (rentability_index['price'] / rentability_index['disponibilidade_365']) * 100
     rentability_index = rentability_index.sort_values(by='rentability_index', ascending=False)
-    indices_filtrados = rentability_index['bairro'][::2]  #  cada 2 bairros
+    indices_filtrados = rentability_index['bairro'][::2]
     valores_filtrados = rentability_index['rentability_index'][::2]
-
-    # Plotar o gráfico
-    plt.figure(figsize=(30, 16))  
+    plt.figure(figsize=(30, 16))
     sns.barplot(x=indices_filtrados, y=valores_filtrados, palette='Greens_d', width=0.5)
-
-    # Ajustar os rótulos do eixo x
-    plt.xticks(rotation=90, fontsize=18)  
-    plt.tick_params(axis='x', pad=20)  
-
-    # Título e rótulos dos eixos
-    # plt.title('Índice de Rentabilidade por Bairro', fontsize=34)
+    plt.xticks(rotation=90, fontsize=18)
+    plt.tick_params(axis='x', pad=20)
     plt.xlabel('Bairro', fontsize=26)
     plt.ylabel('Índice de Rentabilidade', fontsize=30)
     plt.tight_layout()
-    plt.subplots_adjust(bottom=0.3)  
-
+    plt.subplots_adjust(bottom=0.3)
     return save_plot_as_base64()
 
+# Palavras mais frequentes em anúncios caros
 def generate_word_price_relationship():
-    # Filtrar anúncios caros (preço > 300)
     expensive_listings = data[data['price'] > 5000]
     
-    # Processar os nomes dos anúncios para extrair palavras
     def preprocess_text(text):
-        text = text.lower()
-        text = re.sub(r'[^a-z\s]', '', text)  
-        words = text.split() 
+        text = text.lower()  # Converter para minúsculas
+        text = re.sub(r'[^a-z\s]', '', text)  # Remover caracteres especiais e números
+        words = text.split()  # Dividir em palavras
         return words
-
-    # Aplicar a função de pré-processamento aos nomes dos anúncios caros
+    
     words = expensive_listings['nome'].apply(preprocess_text).explode()
-
     word_counts = words.value_counts()
-
     words_to_exclude = {"by", "br", "the", "of"}
     filtered_word_counts = word_counts[~word_counts.index.isin(words_to_exclude)]
-
     filtered_word_counts = filtered_word_counts.head(10)
-
-    # Plotar o gráfico
+    
     plt.figure(figsize=(10, 6))
     sns.barplot(x=filtered_word_counts.values, y=filtered_word_counts.index, palette='Blues_d')
-    # plt.title('Palavras Mais Frequentes em Anúncios Caros', fontsize=20)
     plt.xlabel('Frequência', fontsize=16)
     plt.ylabel('Palavras', fontsize=16)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.tight_layout()
+    return save_plot_as_base64()
 
-    # Salvar o gráfico como Base64
+
+# Melhores Lugares para Investir
+def generate_investment_opportunities():
+    investment_data = (
+        data.groupby('bairro')
+        .agg({
+            'price': 'mean',  # Preço médio
+            'reviews_por_mes': 'mean',  # Reviews médias por mês
+            'host_name': 'count'  # Número de listagens
+        })
+        .reset_index()
+    )
+    investment_data['rentability'] = investment_data['price'] / investment_data['reviews_por_mes']
+    investment_data = investment_data.replace([np.inf, -np.inf], np.nan).dropna()  # Remover valores infinitos
+
+    plt.figure(figsize=(12, 8))
+    sns.scatterplot(
+        data=investment_data,
+        x='rentability',
+        y='reviews_por_mes',
+        size='host_name', 
+        sizes=(50, 500),
+        hue='host_name',
+        palette='viridis',
+        alpha=0.7
+    )
+
+    #  visuail
+    plt.xlabel('Rentabilidade (Preço Médio / Reviews por Mês)', fontsize=16)
+    plt.ylabel('Demanda (Reviews por Mês)', fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.legend(title='Número de Listagens', fontsize=12)
+    plt.tight_layout()
+
     return save_plot_as_base64()
 
 # Rota para gerar gráficos
 @app.route('/generate_charts', methods=['POST'])
 def generate_charts():
     try:
-
         price_distribution = generate_price_distribution()
         avg_price_by_neighborhood = generate_avg_price_by_neighborhood()
         correlation_matrix = generate_correlation_matrix()
@@ -224,10 +232,10 @@ def generate_charts():
         price_boxplot = generate_price_boxplot()
         reviews_per_month = generate_reviews_per_month()
         top_hosts = generate_top_hosts()
-        rentability_index = generate_rentability_index() 
+        rentability_index = generate_rentability_index()
         word_price_relationship = generate_word_price_relationship()
-
-        # Retornar os dados como JSON
+        investment_opportunities = generate_investment_opportunities()
+        
         response_data = {
             "price_distribution": price_distribution,
             "avg_price_by_neighborhood": avg_price_by_neighborhood,
@@ -238,29 +246,40 @@ def generate_charts():
             "reviews_per_month": reviews_per_month,
             "top_hosts": top_hosts,
             "rentability_index": rentability_index,
-            "word_price_relationship": word_price_relationship
+            "word_price_relationship": word_price_relationship,
+            "investment_opportunities": investment_opportunities
         }
         return jsonify(response_data)
     except Exception as e:
         print(f"Erro ao gerar gráficos: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Rota para a página inicial
+# Página inicial
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# Rota para buscar hotéis
+# Buscar hotéis
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('q', '').lower()
+    max_results = 15 
     if not query:
         return jsonify([])
-    results = data[data.index.str.startswith(query)]
-    results = results.to_dict(orient='records')
-    return jsonify(results)
+    
+    results = data[data.index.str.contains(query, case=False, na=False)]
+    limited_results = results.head(max_results)
+    
+    results_dict = limited_results.to_dict(orient='records')
+    
+    for result in results_dict:
+        for key, value in result.items():
+            if isinstance(value, float) and math.isnan(value):
+                result[key] = None
+    
+    return jsonify(results_dict)
 
-# Rota para prever o preço
+# Prever o preço
 @app.route('/predict', methods=['POST'])
 def predict():
     data_json = request.json
@@ -268,10 +287,12 @@ def predict():
     prediction = model.predict(df)
     return jsonify({"prediction": f"${prediction[0]:.2f}"})
 
-# Rota para a página de gráficos
+# Página de gráficos
 @app.route('/graph')
 def graph():
     return render_template('graph.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+    

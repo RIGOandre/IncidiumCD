@@ -7,6 +7,8 @@ import base64
 
 df = pd.read_csv(r'C:\Users\manoa\Documents\GitHub\IncidiumCD\data\teste_indicium_precificacao.csv')
 
+
+
 def generate_price_distribution():
     plt.figure(figsize=(10, 6))
     sns.histplot(df['price'], bins=50, kde=True, color='black')

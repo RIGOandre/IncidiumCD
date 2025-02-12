@@ -21,11 +21,14 @@
             margin-bottom: 20px;
         }
         a {
-            font-size: 1.6em;
+            font-size: 1.4em;
             text-decoration: underline;
             color: rgb(0, 4, 250);
             font-weight: 600;
             text-transform: uppercase;
+            padding: 10px;
+            display: flex;
+            text-align: initial !important;
         }
 
         #loading-screen {
@@ -34,7 +37,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.966);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -85,10 +88,10 @@
     <img id="top_hosts">
     <h1>Rentabilidade</h1>
     <img id="rentability_index">
-
     <h1>Palavras Mais Frequentes em Anúncios Caros (> $5000)</h1>
     <img id="word_price_relationship">
-
+    <h1>Melhores lugares para investir</h1>
+    <img id="investment_opportunities">
     <script>
 
         function hideLoadingScreen() {
@@ -106,7 +109,6 @@
         })
         .then(response => response.json())
         .then(data => {
-            // Atualizar as imagens com os dados recebidos
             document.getElementById('price_distribution').src = `data:image/png;base64,${data.price_distribution}`;
             document.getElementById('avg_price_by_neighborhood').src = `data:image/png;base64,${data.avg_price_by_neighborhood}`;
             document.getElementById('correlation_matrix').src = `data:image/png;base64,${data.correlation_matrix}`;
@@ -117,14 +119,14 @@
             document.getElementById('top_hosts').src = `data:image/png;base64,${data.top_hosts}`;
             document.getElementById('rentability_index').src = `data:image/png;base64,${data.rentability_index}`;
             document.getElementById('word_price_relationship').src = `data:image/png;base64,${data.word_price_relationship}`;
-
+            document.getElementById('investment_opportunities').src = `data:image/png;base64,${data.investment_opportunities}`;
             hideLoadingScreen();
         })
         .catch(error => {
             console.error('Erro ao carregar gráficos:', error);
             hideLoadingScreen();
         });
-        setTimeout(hideLoadingScreen, 10000); // Oculta após 10 segundos
+        setTimeout(hideLoadingScreen, 10000); // Oculta após 10 s
     </script>
 </body>
 </html>
