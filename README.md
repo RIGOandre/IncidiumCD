@@ -63,10 +63,12 @@ joblib==1.4.2
 kiwisolver==1.4.8
 MarkupSafe==3.0.2
 matplotlib==3.10.0
+narwhals==1.25.2
 numpy==2.2.2
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0
+plotly==6.0.0
 pyparsing==3.2.1
 python-dateutil==2.9.0.post0
 pytz==2025.1
@@ -106,7 +108,7 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
    ```
 
 4. **Treine o Modelo**:
-   - Execute o notebook `notebooks/treinamento_modelo.ipynb` para treinar e salvar o modelo (`model.pkl`).
+   - Execute o notebook `notebooks/treinamento_modelo.py` para treinar e salvar o modelo (`model.pkl`).
 
 5. **Execute a API Flask**:
    - Inicie a API Flask com o seguinte comando:
@@ -116,7 +118,7 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
    - Acesse a interface no navegador em `http://127.0.0.1:5000/`.
 
 6. **Teste o Modelo**:
-   - Insira os dados do apartamento na interface HTML e veja a previsão de preço.
+   - Insira o nome na interface HTML e veja a previsão de preço.
 
 ---
 
