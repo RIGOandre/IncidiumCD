@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib
-matplotlib.use('Agg')  # Define o backend para 'Agg'
+matplotlib.use('Agg')  
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
@@ -24,6 +24,7 @@ def tkinter_thread():
 # Carregar o modelo treinado
 with open('../model.pkl', 'rb') as f:
     model = pickle.load(f)
+# Carregar o modelo de regressão
 
 # Definir o caminho relativo para o CSV
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,6 +62,7 @@ def save_plot_as_base64():
     image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
     plt.close()
     return image_base64
+
 
 # Distribuição de Preços
 def generate_price_distribution():
