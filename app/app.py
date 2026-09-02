@@ -6,7 +6,7 @@ Rotas:
     GET  /search?q=        busca anuncios pelo nome
     POST /predict          preve o preco de um anuncio
     GET|POST /generate_charts   devolve os graficos em base64
-    GET  /health           checagem rapida de que dados e modelo subiram
+    GET  /health           checagem rapida de que os dados (o CSV) subiram
 """
 
 import logging
@@ -93,6 +93,7 @@ def generate_charts():
 
 @app.route("/health")
 def health():
+    # So confere o CSV; o modelo e carregado (e pode falhar) so no primeiro /predict.
     return jsonify({"status": "ok", "listings": len(get_data())})
 
 

@@ -30,7 +30,9 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 # - `ColumnTransformer` e `Pipeline`: pipelines modulares de pre-processamento
 #   e modelagem.
 # - `SimpleImputer`: tratamento de valores ausentes.
-# - `gzip` + `pickle`: gravam o modelo treinado (56 MB crus, ~13 MB comprimido).
+# - `gzip` + `pickle`: gravam o modelo treinado (compactado, o model.pkl.gz
+#   fica com uns 54 MB - o numero muda conforme o dataset e a floresta,
+#   entao confira de novo antes de citar um valor aqui).
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = PROJECT_ROOT / "data" / "teste_indicium_precificacao.csv"
