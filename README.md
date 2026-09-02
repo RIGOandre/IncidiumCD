@@ -45,6 +45,36 @@
   - Interface HTML simples para interação com o modelo.
 ---
 
+<h2 align="center">🗂️ Estrutura do Projeto 🗂️</h2>
+
+```plaintext
+IncidiumCD/
+├── app/
+│   ├── app.py          # rotas Flask e o ponto de entrada (python app/app.py)
+│   ├── config.py       # caminhos, colunas do modelo e variáveis de ambiente
+│   ├── dataset.py      # carga do CSV e a busca por nome
+│   ├── model.py        # carga do model.pkl.gz e o payload da previsão
+│   ├── charts.py       # os onze gráficos da EDA, em base64 e com cache
+│   ├── static/         # css e js da interface
+│   └── templates/      # index.html (busca) e graph.html (gráficos)
+├── data/
+│   └── teste_indicium_precificacao.csv   # dataset original, ~49 mil linhas
+├── notebooks/
+│   ├── eda.ipynb                # análise exploratória
+│   └── treinamento_modelo.py    # treina e gera o model.pkl.gz
+├── tests/               # suíte pytest, sobe a aplicação com dados e modelo reais
+├── model.pkl.gz         # modelo treinado, versionado no repositório
+├── requirements.txt
+└── requirements-dev.txt
+```
+
+Dentro de `app/` cada módulo cuida de uma coisa só: `config.py` não importa nada
+dos outros módulos do projeto, `dataset.py` só entende de CSV, `model.py` só de
+modelo, `charts.py` só de gráfico — e `app.py` apenas orquestra as rotas em cima
+disso.
+
+---
+
 <h2 align="center">📦 Pacotes e Dependências Necessárias 📦</h2>
 
 O projeto depende diretamente destes pacotes, nas versões em que foi testado:
@@ -95,6 +125,8 @@ com ela, e abrir o pickle em outra versão pode falhar ou mudar o resultado sem 
      python app/app.py
      ```
    - Acesse a interface no navegador em `http://127.0.0.1:5000/`.
+   - Porta, host, caminho do CSV... dá para mudar sem tocar no código, veja
+     Variáveis de Ambiente logo abaixo.
 
 5. **Teste o Modelo**:
    - Busque um anúncio pelo nome na interface e veja a previsão de preço.
@@ -108,6 +140,45 @@ com ela, e abrir o pickle em outra versão pode falhar ou mudar o resultado sem 
      nada para editar no script.
    - O treinamento leva de 5 a 10 minutos, dependendo da máquina, e sobrescreve
      o `model.pkl.gz`.
+
+---
+
+<h2 align="center">⚙️ Variáveis de Ambiente ⚙️</h2>
+
+Nenhuma é obrigatória — sem elas a aplicação sobe com os padrões abaixo, os
+mesmos usados nos testes. As três primeiras são lidas em `app/config.py`; as
+outras quatro (log e as opções do `app.run()`) são lidas direto em `app/app.py`.
+
+- **`INCIDIUM_CSV`**: caminho do CSV de anúncios. Padrão: `data/teste_indicium_precificacao.csv`, resolvido a partir da raiz do projeto (não do diretório de onde o comando é chamado).
+- **`INCIDIUM_MODEL`**: caminho do arquivo do modelo (`.pkl` ou `.pkl.gz`). Sem ela, a aplicação procura, nessa ordem, `model.pkl.gz` e depois `model.pkl` na raiz do projeto.
+- **`INCIDIUM_SEARCH_LIMIT`**: quantidade máxima de resultados que `/search` devolve. Padrão: `15`.
+- **`INCIDIUM_LOG_LEVEL`**: nível de log (`DEBUG`, `INFO`, `WARNING`...). Padrão: `INFO`.
+- **`INCIDIUM_HOST`**: endereço onde o Flask escuta. Padrão: `127.0.0.1`.
+- **`INCIDIUM_PORT`**: porta onde o Flask escuta. Padrão: `5000`.
+- **`INCIDIUM_DEBUG`**: liga o modo debug do Flask quando o valor é exatamente `"1"` (qualquer outro valor desliga). Padrão: `"1"` — ou seja, `python app/app.py` já sobe em modo debug.
+
+Exemplo, mudando a porta e apontando para outro CSV:
+
+```bash
+# Windows (PowerShell)
+$env:INCIDIUM_PORT = "8000"
+$env:INCIDIUM_CSV = "C:\caminho\outro.csv"
+python app/app.py
+
+# Linux/macOS
+INCIDIUM_PORT=8000 INCIDIUM_CSV=/caminho/outro.csv python app/app.py
+```
+
+---
+
+<h2 align="center">🌐 Rotas Disponíveis 🌐</h2>
+
+- **`GET /`**: tela de busca.
+- **`GET /graph`**: página com os onze gráficos da EDA, que busca as imagens em `/generate_charts` via `fetch`.
+- **`GET /search?q=termo`**: busca anúncios pelo nome (contém, sem diferenciar maiúsculas/minúsculas) e devolve até `INCIDIUM_SEARCH_LIMIT` resultados em JSON.
+- **`POST /predict`**: recebe o JSON de um anúncio (o mesmo registro que `/search` devolve) e responde com o preço previsto. Corpo que não é JSON, ou que falta `latitude`, `longitude`, `bairro_group` ou `room_type`, volta `400`.
+- **`GET|POST /generate_charts`**: gera os onze gráficos e devolve cada um em base64. A primeira chamada demora uns 8 segundos; as próximas saem do cache em memória e voltam na hora. Use `?refresh=1` para forçar o redesenho — necessário depois de trocar o CSV.
+- **`GET /health`**: `{"status": "ok", "listings": N}`. Confere só se o CSV carregou; não chega a tocar no modelo.
 
 ---
 
@@ -145,6 +216,6 @@ O modelo utiliza um pipeline que inclui:
 2. **Modelo**:
    - Um `RandomForestRegressor` é usado para prever os preços com base nas características fornecidas.
 3. **Avaliação**:
-   - O desempenho do modelo é avaliado usando RMSE (Root Mean Squared Error).
+   - O desempenho do modelo é avaliado com RMSE (Root Mean Squared Error), MAE (Mean Absolute Error) e R², impressos no terminal ao final do treinamento.
 
 ---
