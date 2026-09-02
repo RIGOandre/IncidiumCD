@@ -6,154 +6,169 @@ document.addEventListener("DOMContentLoaded", () => {
     const popupDataList = document.getElementById("popupDataList");
     const predictButton = document.getElementById("predictButton");
 
-    let selectedHotel = null;
+    const SEARCH_DELAY = 250; // ms de espera antes de consultar o servidor
 
-    //  buscar hotéis
-    searchInput.addEventListener("input", async (event) => {
-        const query = event.target.value.trim().toLowerCase();
+    let selectedHotel = null;
+    let searchTimer = null;
+    let inFlight = null; // cancela a busca anterior quando outra comeca
+
+    // Campos que nao interessam na ficha do anuncio.
+    const HIDDEN_FIELDS = new Set(["id", "host_id"]);
+
+    function formatLabel(key) {
+        return key
+            .replace(/_/g, " ")
+            .split(" ")
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    }
+
+    function formatValue(value) {
+        return value === null || value === undefined || value === "" ? "—" : value;
+    }
+
+    function renderResults(results) {
+        searchResults.innerHTML = "";
+
+        if (results.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "no-results";
+            empty.textContent = "No results found.";
+            searchResults.appendChild(empty);
+            return;
+        }
+
+        results.forEach(hotel => {
+            const item = document.createElement("div");
+            item.className = "result-item";
+            item.textContent = `${hotel.nome} - ${hotel.bairro_group}`;
+            item.setAttribute("role", "option");
+            item.tabIndex = 0;
+
+            const select = () => openPopup(hotel);
+            item.addEventListener("click", select);
+            item.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    select();
+                }
+            });
+
+            searchResults.appendChild(item);
+        });
+    }
+
+    async function runSearch(query) {
+        if (inFlight) {
+            inFlight.abort();
+        }
+        inFlight = new AbortController();
+
+        try {
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}`, {
+                signal: inFlight.signal
+            });
+            if (!response.ok) {
+                throw new Error(`Servidor respondeu ${response.status}`);
+            }
+            renderResults(await response.json());
+        } catch (error) {
+            if (error.name !== "AbortError") {
+                console.error("Erro ao buscar hotéis:", error);
+            }
+        }
+    }
+
+    searchInput.addEventListener("input", event => {
+        const query = event.target.value.trim();
+
+        clearTimeout(searchTimer);
         if (!query) {
             searchResults.innerHTML = "";
             return;
         }
 
-        try {
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-            const results = await response.json();
-
-            searchResults.innerHTML = "";
-            if (results.length === 0) {
-                searchResults.innerHTML = "<div>No results found.</div>";
-                return;
-            }
-
-            results.forEach(hotel => {
-                const div = document.createElement("div");
-                div.textContent = `${hotel.nome} - ${hotel.bairro_group}`;
-                div.style.cursor = "pointer";
-                div.addEventListener("click", () => {
-                    selectedHotel = hotel;
-                    openPopup(hotel);
-                });
-                searchResults.appendChild(div);
-            });
-        } catch (error) {
-            console.error("Erro ao buscar hotéis:", error);
-        }
+        // Sem o debounce cada tecla digitada virava uma requisição.
+        searchTimer = setTimeout(() => runSearch(query), SEARCH_DELAY);
     });
 
-    // Abrir o pop-up
     function openPopup(hotel) {
-        popupDataList.innerHTML = ""; // Limpa o conteúdo anterior
+        selectedHotel = hotel;
+        popupDataList.innerHTML = "";
 
-        for (const [key, value] of Object.entries(hotel)) {
-            const formattedKey = key
-                .replace(/_/g, " ")
-                .split(" ")
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ");
+        Object.entries(hotel)
+            .filter(([key]) => !HIDDEN_FIELDS.has(key))
+            .forEach(([key, value]) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `${formatLabel(key)}: ${formatValue(value)}`;
+                popupDataList.appendChild(listItem);
+            });
 
-            const listItem = document.createElement("li");
-            listItem.textContent = `${formattedKey}: ${value}`;
-            popupDataList.appendChild(listItem);
-        }
-
-        popup.style.display = "block"; // Mostra o pop-up
+        popup.hidden = false;
+        predictButton.focus();
     }
-
-    // Fechar o pop-up com confirmação de preço
-    closePopup.addEventListener("click", () => {
-        if (!selectedHotel) {
-            alert("Selecione um hotel primeiro.");
-            return;
-        }
-
-        // Enviar dados para previsão
-        fetch("/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(selectedHotel)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // confirmação de preço  SweetAlert2
-            Swal.fire({
-                title: `<strong>The Expected Price Is ${data.prediction}</strong>`,
-                icon: "success",
-                html: `
-                   <h4>What do you think about this price? </h4>
-                `,
-                showCloseButton: true,
-                showCancelButton: true,
-                focusConfirm: false,
-                confirmButtonText: `
-                  <i class="fa fa-thumbs-up"></i> Great!
-                `,
-                confirmButtonAriaLabel: "Thumbs up, great!",
-                cancelButtonText: `
-                Not Great!
-                `,
-            }).then((result) => {
-                closeAllPopups();
-            });
-        })
-        .catch(error => {
-            console.error("Erro ao enviar dados:", error);
-        });
-    });
-
-    // Fechar o pop-up ao clicar fora 
-    window.addEventListener("click", (event) => {
-        if (event.target === popup) {
-            popup.style.display = "none";
-        }
-    });
-
-    // Enviar dados para previsão
-    predictButton.addEventListener("click", () => {
-        if (!selectedHotel) {
-            alert("Selecione um hotel primeiro.");
-            return;
-        }
-
-        fetch("/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(selectedHotel)
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.fire({
-                title: `<strong>The expected price is ${data.prediction}</strong>`,
-                icon: "success",
-                html: `
-                   <h4>What do you think about this price? </h4>
-                `,
-                showCloseButton: true,
-
-                focusConfirm: false,
-                confirmButtonText: `
-                  <i class="fa fa-thumbs-up"></i> Great!
-                `,
-                confirmButtonAriaLabel: "Thumbs up, great!",
-
-                
-            }).then((result) => {
-
-                closeAllPopups();
-            });
-        })
-        .catch(error => {
-            console.error("Erro ao enviar dados:", error);
-        });
-    });
 
     function closeAllPopups() {
-        popup.style.display = "none";
-
-        Swal.close();
+        popup.hidden = true;
+        if (window.Swal) {
+            Swal.close();
+        }
     }
+
+    // O X fecha o pop-up. Antes ele disparava a previsão junto, o que fazia
+    // o alerta de preço aparecer justamente quando se queria sair da tela.
+    closePopup.addEventListener("click", closeAllPopups);
+
+    window.addEventListener("click", event => {
+        if (event.target === popup) {
+            closeAllPopups();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !popup.hidden) {
+            closeAllPopups();
+        }
+    });
+
+    predictButton.addEventListener("click", async () => {
+        if (!selectedHotel) {
+            Swal.fire({ icon: "info", title: "Selecione um hotel primeiro." });
+            return;
+        }
+
+        predictButton.disabled = true;
+        try {
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(selectedHotel)
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `Servidor respondeu ${response.status}`);
+            }
+
+            await Swal.fire({
+                title: `<strong>The expected price is ${data.prediction}</strong>`,
+                icon: "success",
+                html: "<h4>What do you think about this price?</h4>",
+                showCloseButton: true,
+                focusConfirm: false,
+                confirmButtonText: '<i class="fa fa-thumbs-up"></i> Great!',
+                confirmButtonAriaLabel: "Thumbs up, great!"
+            });
+            closeAllPopups();
+        } catch (error) {
+            console.error("Erro ao enviar dados:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Não foi possível calcular a previsão",
+                text: error.message
+            });
+        } finally {
+            predictButton.disabled = false;
+        }
+    });
 });

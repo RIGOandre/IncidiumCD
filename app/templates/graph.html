@@ -1,132 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráficos</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            align-items: center;
-            text-align: center;
-            justify-content: center;
-        }
-        h1 {
-            margin-top: 30px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 20px;
-        }
-        a {
-            font-size: 1.4em;
-            text-decoration: underline;
-            color: rgb(0, 4, 250);
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 10px;
-            display: flex;
-            text-align: initial !important;
-        }
-
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.966);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-        }
-        #loading-screen h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        #loading-spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <title>Gráficos — Indicium Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='graph.css') }}">
 </head>
 <body>
-    <!-- Tela de Carregamento -->
-    <div id="loading-screen">
+    <!-- Tela de carregamento: os gráficos chegam por fetch, em base64 -->
+    <div id="loading-screen" role="status" aria-live="polite">
         <h2>Carregando Gráficos...</h2>
-        <div id="loading-spinner"></div>
+        <div id="loading-spinner" aria-hidden="true"></div>
     </div>
 
-    <a href="/">home</a>
-    <h1 style="margin-bottom: -5px;">Distribuição de Preços</h1>
-    <img id="price_distribution">
-    <h1>Preço Médio por Bairro</h1>
-    <img id="avg_price_by_neighborhood">
-    <h1 style="margin-bottom: -7px;" >Matriz de Correlação </h1>
-    <img id="correlation_matrix">
-    <h1>Relação entre Tipo de Quarto e Preço</h1>
-    <img id="room_type_vs_price">
-    <h1 style="margin-bottom: -4px;">Relação entre Mínimo de Noites, Disponibilidade e Preço</h1>
-    <img id="min_nights_vs_price">
-    <h1 style="margin-bottom: -4px;">Boxplot dos Preços (Outliers)</h1>
-    <img id="price_boxplot">
-    <h1>Distribuição de Reviews por Mês</h1>
-    <img id="reviews_per_month">
-    <h1 style="margin-bottom: -4px;"" >Top 10 Hosts com Mais Listagens</h1>
-    <img id="top_hosts">
-    <h1>Rentabilidade</h1>
-    <img id="rentability_index">
-    <h1>Palavras Mais Frequentes em Anúncios Caros (> $5000)</h1>
-    <img id="word_price_relationship">
-    <h1>Melhores lugares para investir</h1>
-    <img id="investment_opportunities">
+    <a class="voltar" href="{{ url_for('home') }}">home</a>
+
+    <p id="chart-error" class="chart-error" hidden>
+        Não foi possível carregar os gráficos. Verifique o terminal do servidor e recarregue a página.
+    </p>
+
+    {% for chart_id, titulo in charts.items() %}
+    <section class="chart">
+        <h1>{{ titulo }}</h1>
+        <img id="{{ chart_id }}" alt="{{ titulo }}">
+    </section>
+    {% endfor %}
+
     <script>
+        const loadingScreen = document.getElementById('loading-screen');
+        const chartError = document.getElementById('chart-error');
 
         function hideLoadingScreen() {
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-            }
+            loadingScreen.hidden = true;
         }
 
-        fetch('/generate_charts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('price_distribution').src = `data:image/png;base64,${data.price_distribution}`;
-            document.getElementById('avg_price_by_neighborhood').src = `data:image/png;base64,${data.avg_price_by_neighborhood}`;
-            document.getElementById('correlation_matrix').src = `data:image/png;base64,${data.correlation_matrix}`;
-            document.getElementById('room_type_vs_price').src = `data:image/png;base64,${data.room_type_vs_price}`;
-            document.getElementById('min_nights_vs_price').src = `data:image/png;base64,${data.min_nights_vs_price}`;
-            document.getElementById('price_boxplot').src = `data:image/png;base64,${data.price_boxplot}`;
-            document.getElementById('reviews_per_month').src = `data:image/png;base64,${data.reviews_per_month}`;
-            document.getElementById('top_hosts').src = `data:image/png;base64,${data.top_hosts}`;
-            document.getElementById('rentability_index').src = `data:image/png;base64,${data.rentability_index}`;
-            document.getElementById('word_price_relationship').src = `data:image/png;base64,${data.word_price_relationship}`;
-            document.getElementById('investment_opportunities').src = `data:image/png;base64,${data.investment_opportunities}`;
-            hideLoadingScreen();
-        })
-        .catch(error => {
-            console.error('Erro ao carregar gráficos:', error);
-            hideLoadingScreen();
-        });
-        setTimeout(hideLoadingScreen, 10000); // Oculta após 10 s
+        fetch('/generate_charts')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Servidor respondeu ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                Object.entries(data).forEach(([id, base64]) => {
+                    const img = document.getElementById(id);
+                    if (img) {
+                        img.src = `data:image/png;base64,${base64}`;
+                    }
+                });
+                hideLoadingScreen();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar gráficos:', error);
+                chartError.hidden = false;
+                hideLoadingScreen();
+            });
     </script>
 </body>
 </html>

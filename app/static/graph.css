@@ -1,0 +1,95 @@
+/* Pagina de graficos da analise exploratoria */
+
+body {
+  margin: 20px;
+  font-family: Verdana, Arial, sans-serif;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.voltar {
+  display: inline-block;
+  padding: 10px;
+  font-size: 1.4em;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: underline;
+  color: rgb(0, 4, 250);
+}
+
+.voltar:focus-visible {
+  outline: 3px solid rgb(0, 4, 250);
+  outline-offset: 4px;
+}
+
+.chart {
+  margin-bottom: 60px;
+}
+
+.chart h1 {
+  margin: 30px 0 10px;
+  font-size: 1.6em;
+}
+
+.chart img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Espaco reservado enquanto a imagem nao chega, para a pagina nao "pular" */
+.chart img:not([src]) {
+  display: block;
+  min-height: 220px;
+}
+
+.chart-error {
+  margin: 20px auto;
+  padding: 14px 18px;
+  max-width: 620px;
+  border: 1px solid #e0b4b4;
+  border-radius: 6px;
+  background-color: #fff4f4;
+  color: #7a2323;
+}
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.966);
+}
+
+#loading-screen[hidden] {
+  display: none;
+}
+
+#loading-screen h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+#loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respeita quem pediu menos animacao no sistema */
+@media (prefers-reduced-motion: reduce) {
+  #loading-spinner {
+    animation: none;
+  }
+}

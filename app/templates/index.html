@@ -1,50 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Incidium</title>
-    <link rel="stylesheet" href="../static/style.css">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-    <style>
-        .heaG , a{
-            font-size: 1em;
-            text-decoration: underline;
-            color: rgb(0, 4, 250);
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 10px;
-            text-align: initial !important;
-        }
-        body{
-            align-items: center;
-            text-align: center;
-        }
-        
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Preco previsto para aluguel temporario em Nova York.">
+    <title>Indicium Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-        
     <div class="heaG">
-        <a href="/graph" class="animated-text">how the predictions were made</a>
+        <a href="{{ url_for('graph') }}" class="animated-text">how the predictions were made</a>
     </div>
 
-    <h1 id="dynamicText" style="margin-top: 90px; text-transform: uppercase;"> Find the perfect place for you! </h1>  
-    <!-- Barra de Pesquisa -->
-    <section style="margin-top: 20px;">
+    <h1 id="dynamicText" class="hero-title">Find the perfect place for you!</h1>
+
+    <!-- Barra de pesquisa -->
+    <section class="search-section">
         <div class="grid" id="brpq"></div>
         <div id="poda">
             <div class="glow"></div>
             <div class="darkBorderBg"></div>
-            <div class="darkBorderBg"></div>
-            <div class="darkBorderBg"></div>
+            <div class="white"></div>
+            <div class="border"></div>
             <div id="main">
-                <input placeholder="Search Hotel Name" type="text" id="searchInput" class="input" />
+                <label class="visually-hidden" for="searchInput">Search hotel name</label>
+                <input
+                    id="searchInput"
+                    class="input"
+                    type="search"
+                    placeholder="Search Hotel Name"
+                    autocomplete="off"
+                    aria-controls="searchResults"
+                />
                 <div id="input-mask"></div>
                 <div id="pink-mask"></div>
-                <div id="filter-icon" style="display: none;">
-                </div>
                 <div id="search-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" height="24" fill="none" class="feather feather-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" class="feather feather-search" aria-hidden="true">
                         <circle stroke="url(#search)" r="8" cy="11" cx="11"></circle>
                         <line stroke="url(#searchl)" y2="16.65" y1="22" x2="16.65" x1="22"></line>
                         <defs>
@@ -63,16 +54,16 @@
         </div>
     </section>
 
-    <!-- Resultados da Pesquisa -->
-    <div id="searchResults" style="margin-top: 20px;"></div>
+    <!-- Resultados da pesquisa -->
+    <div id="searchResults" role="listbox" aria-live="polite"></div>
 
-    <!-- Pop-up -->
-    <div id="popup" class="popup">
+    <!-- Pop-up com os detalhes do anuncio -->
+    <div id="popup" class="popup" role="dialog" aria-modal="true" aria-labelledby="popupTitle" hidden>
         <div class="popup-content">
-            <span id="closePopup" class="close">&times;</span>
-            <h2>Detalhes do Hotel</h2>
+            <button id="closePopup" class="close" type="button" aria-label="Fechar">&times;</button>
+            <h2 id="popupTitle">Detalhes do Hotel</h2>
             <ul id="popupDataList"></ul>
-            <button id="predictButton" class="btn-17">
+            <button id="predictButton" class="btn-17" type="button">
                 <span class="text-container">
                     <span id="preve" class="text">Predict</span>
                 </span>
@@ -81,6 +72,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
