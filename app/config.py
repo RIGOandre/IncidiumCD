@@ -34,6 +34,12 @@ NUMERIC_FEATURES = [
 CATEGORICAL_FEATURES = ["bairro_group", "bairro", "room_type"]
 MODEL_FEATURES = NUMERIC_FEATURES + CATEGORICAL_FEATURES
 
+# Sem estas colunas a previsao nao significa nada: o imputer preencheria o resto
+# e o modelo devolveria a media do treino com cara de resposta. A tela sempre
+# manda o registro inteiro vindo da busca, entao exigir as quatro nao atrapalha
+# o uso normal - so barra payload aleatorio.
+REQUIRED_FEATURES = ["latitude", "longitude", "bairro_group", "room_type"]
+
 # Colunas numericas usadas apenas na analise exploratoria.
 EDA_NUMERIC_FEATURES = [
     "latitude",

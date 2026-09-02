@@ -14,6 +14,7 @@ from config import (
     MODEL_FEATURES,
     MODEL_PATH,
     NUMERIC_FEATURES,
+    REQUIRED_FEATURES,
 )
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,16 @@ def build_features(payload):
     """
     if not isinstance(payload, dict):
         raise ValueError("Envie um objeto JSON com os dados do anuncio.")
+
+    ausentes = [
+        feature
+        for feature in REQUIRED_FEATURES
+        if payload.get(feature) is None or payload.get(feature) == ""
+    ]
+    if ausentes:
+        raise ValueError(
+            "Faltam colunas obrigatorias no anuncio: " + ", ".join(ausentes) + "."
+        )
 
     frame = pd.DataFrame([{feature: payload.get(feature) for feature in MODEL_FEATURES}])
 

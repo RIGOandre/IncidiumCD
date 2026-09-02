@@ -47,41 +47,22 @@
 
 <h2 align="center">📦 Pacotes e Dependências Necessárias 📦</h2>
 
-Para executar este projeto, você precisará dos seguintes pacotes e suas versões:
+O projeto depende diretamente destes pacotes, nas versões em que foi testado:
 
 ```plaintext
-blinker==1.9.0
-click==8.1.8
-colorama==0.4.6
-contourpy==1.3.1
-cycler==0.12.1
-Flask==3.1.0
-fonttools==4.56.0
-itsdangerous==2.2.0
-Jinja2==3.1.5
-joblib==1.4.2
-kiwisolver==1.4.8
-MarkupSafe==3.0.2
-matplotlib==3.10.0
-narwhals==1.25.2
-numpy==2.2.2
-packaging==24.2
-pandas==2.2.3
-pillow==11.1.0
-plotly==6.0.0
-pyparsing==3.2.1
-python-dateutil==2.9.0.post0
-pytz==2025.1
+Flask==3.1.3
+pandas==3.0.5
+numpy==2.5.2
 scikit-learn==1.6.1
-scipy==1.15.1
+matplotlib==3.11.1
 seaborn==0.13.2
-six==1.17.0
-threadpoolctl==3.5.0
-tzdata==2025.1
-Werkzeug==3.1.3
 ```
 
-Você pode instalar todas as dependências usando o arquivo `requirements.txt` fornecido no repositório.
+São os mesmos do `requirements.txt` — as demais bibliotecas entram sozinhas, como
+dependências dessas. Para rodar os testes, use o `requirements-dev.txt`.
+
+A versão do **scikit-learn** é a que mais importa: o `model.pkl.gz` foi serializado
+com ela, e abrir o pickle em outra versão pode falhar ou mudar o resultado sem avisar.
 
 ---
 
@@ -107,21 +88,38 @@ Você pode instalar todas as dependências usando o arquivo `requirements.txt` f
    pip install -r requirements.txt
    ```
 
-4. **Treine o Modelo**:
-   - Execute o notebook `treinamento_modelo.py` para treinar e salvar o modelo (`model.pkl`).
-   -   lembre-se de trocar as rotas pelo seu PATH `df = pd.read_csv(r'teste_indicium_precificacao.csv')` 
-   -   
-   - O treinamento pode levar de 5 a 10 minutos (dependendo do poder computacional)
-
-5. **Execute a API Flask**:
-   - Inicie a API Flask com o seguinte comando:
+4. **Execute a API Flask**:
+   - O modelo treinado (`model.pkl.gz`) já vem no repositório, então não é
+     preciso treinar nada para usar a aplicação.
      ```bash
      python app/app.py
      ```
    - Acesse a interface no navegador em `http://127.0.0.1:5000/`.
 
-6. **Teste o Modelo**:
-   - Insira o nome na interface HTML e veja a previsão de preço.
+5. **Teste o Modelo**:
+   - Busque um anúncio pelo nome na interface e veja a previsão de preço.
+
+6. **Retreine o Modelo (opcional)**:
+   - Só é necessário se você trocar o CSV em `data/` ou quiser mexer no pipeline.
+     ```bash
+     python notebooks/treinamento_modelo.py
+     ```
+   - Os caminhos são resolvidos sozinhos a partir da pasta do projeto, não há
+     nada para editar no script.
+   - O treinamento leva de 5 a 10 minutos, dependendo da máquina, e sobrescreve
+     o `model.pkl.gz`.
+
+---
+
+<h2 align="center">🧪 Testes 🧪</h2>
+
+Os testes sobem a aplicação com o CSV e o modelo de verdade, então cobrem também
+a integração entre os módulos:
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
 ---
 

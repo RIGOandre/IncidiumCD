@@ -1,39 +1,13 @@
-# Ambiente congelado do projeto (Python 3.13)
-# Instale com: pip install -r requirements.txt
+# Dependencias diretas do projeto, nas versoes em que ele foi testado
+# (Python 3.13). Instale com: pip install -r requirements.txt
+#
+# As transitivas ficam a cargo do pip. A versao do scikit-learn importa mais que
+# as outras: model.pkl.gz foi serializado com ela, e carregar um pickle em versao
+# diferente pode falhar ou mudar o resultado silenciosamente.
 
-# --- Aplicacao web ---
-Flask==3.1.0
-Werkzeug==3.1.3
-Jinja2==3.1.5
-itsdangerous==2.2.0
-blinker==1.9.0
-click==8.1.8
-MarkupSafe==3.0.2
-
-# --- Dados e modelagem ---
-pandas==2.2.3
-numpy==2.2.2
+Flask==3.1.3
+pandas==3.0.5
+numpy==2.5.2
 scikit-learn==1.6.1
-scipy==1.15.1
-joblib==1.4.2
-threadpoolctl==3.5.0
-
-# --- Visualizacao ---
-matplotlib==3.10.0
+matplotlib==3.11.1
 seaborn==0.13.2
-plotly==6.0.0
-contourpy==1.3.1
-cycler==0.12.1
-fonttools==4.56.0
-kiwisolver==1.4.8
-narwhals==1.25.2
-pillow==11.1.0
-pyparsing==3.2.1
-
-# --- Utilitarios ---
-colorama==0.4.6
-packaging==24.2
-python-dateutil==2.9.0.post0
-pytz==2025.1
-six==1.17.0
-tzdata==2025.1
