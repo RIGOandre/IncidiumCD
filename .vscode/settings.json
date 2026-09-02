@@ -1,0 +1,12 @@
+{
+    "python.analysis.extraPaths": [
+        "./app"
+    ],
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "[python]": {
+        "editor.rulers": [
+            100
+        ]
+    }
+}

@@ -1,2 +1,20 @@
-# Auto detect text files and perform LF normalization
+# Normaliza fim de linha automaticamente
 * text=auto
+
+# Scripts e templates sempre com LF
+*.py   text eol=lf
+*.js   text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+
+# Binarios: nunca converter
+*.pkl    binary
+*.pkl.gz binary
+*.png    binary
+*.jpg    binary
+
+# Notebooks e CSV nao sao diffaveis de forma util
+*.ipynb -diff
+*.csv   -diff linguist-generated

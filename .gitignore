@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Modelo treinado sem compressao (usar model.pkl.gz)
+model.pkl
+*.pkl
+!*.pkl.gz
+
+# Saidas geradas em tempo de execucao
+app/static/charts/*.png
+
+# Editores / SO
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

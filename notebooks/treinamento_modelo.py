@@ -1,113 +1,131 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
+"""Treinamento do modelo de precificacao.
+
+Rode de qualquer diretorio:
+
+    python notebooks/treinamento_modelo.py
+
+O pipeline treinado e salvo compactado em model.pkl.gz, na raiz do projeto,
+que e o arquivo que a API carrega.
+"""
+
+import gzip
 import pickle
-import numpy as np  
+from pathlib import Path
 
-# - `pandas`: Para manipulação e leitura dos dados.
-# - `train_test_split`: Para dividir os dados em conjuntos de treino e teste.
-# - `RandomForestRegressor`: Modelo de regressão baseado em árvores de decisão.
-# - `mean_squared_error`: Métrica para avaliar o desempenho do modelo.
-# - `OneHotEncoder` e `StandardScaler`: Pré-processamento de variáveis categóricas e numéricas.
-# - `ColumnTransformer` e `Pipeline`: Para criar pipelines modulares de pré-processamento e modelagem.
-# - `SimpleImputer`: Para lidar com valores ausentes.
-# - `pickle`: Para salvar o modelo treinado.
-# - `numpy`: Para operações matemáticas, como calcular a raiz quadrada do MSE.
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+# - `pandas`: manipulacao e leitura dos dados.
+# - `train_test_split`: divide os dados em treino e teste.
+# - `RandomForestRegressor`: modelo de regressao baseado em arvores de decisao.
+# - `root_mean_squared_error` e companhia: metricas de avaliacao.
+# - `OneHotEncoder` e `StandardScaler`: pre-processamento de variaveis
+#   categoricas e numericas.
+# - `ColumnTransformer` e `Pipeline`: pipelines modulares de pre-processamento
+#   e modelagem.
+# - `SimpleImputer`: tratamento de valores ausentes.
+# - `gzip` + `pickle`: gravam o modelo treinado (56 MB crus, ~13 MB comprimido).
 
-df = pd.read_csv(r'C:\Users\manoa\Documents\GitHub\IncidiumCD\data\teste_indicium_precificacao.csv')
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CSV_PATH = PROJECT_ROOT / "data" / "teste_indicium_precificacao.csv"
+MODEL_PATH = PROJECT_ROOT / "model.pkl.gz"
 
+# Caminhos derivados da posicao deste arquivo: antes havia um caminho absoluto
+# da maquina do autor, que quebrava em qualquer outro computador.
 
+NUMERIC_FEATURES = [
+    "latitude",
+    "longitude",
+    "minimo_noites",
+    "numero_de_reviews",
+    "reviews_por_mes",
+    "calculado_host_listings_count",
+    "disponibilidade_365",
+]
+CATEGORICAL_FEATURES = ["bairro_group", "bairro", "room_type"]
 
-# Comentário:
-# - Os dados são carregados de um arquivo CSV localizado no caminho especificado.
-# - Este conjunto de dados contém informações sobre imóveis do Airbnb, incluindo características como localização, 
-# tipo de quarto, disponibilidade e preço.
+# Colunas descartadas: identificadores e textos livres nao ajudam a prever o
+# preco (`price` e o alvo).
+DROP_COLUMNS = ["price", "id", "host_id", "host_name", "nome", "ultima_review"]
 
-X = df.drop(columns=['price', 'id', 'host_id', 'host_name', 'nome', 'ultima_review'])
-y = df['price']
-
-# - `X`: Contém as variáveis independentes (características) usadas para prever o preço.
-# - `y`: Contém a variável dependente (preço), que é o alvo da previsão.
-# - Colunas como `id`, `host_id`, `host_name`, `nome` e `ultima_review` são descartadas porque 
-# não contribuem diretamente para a previsão do preço.
-
-numeric_features = ['latitude', 'longitude', 'minimo_noites', 'numero_de_reviews', 
-                    'reviews_por_mes', 'calculado_host_listings_count', 'disponibilidade_365']
-categorical_features = ['bairro_group', 'bairro', 'room_type']
-
-# - `numeric_features`: Lista de variáveis numéricas que serão padronizadas.
-# - `categorical_features`: Lista de variáveis categóricas que serão codificadas usando One-Hot Encoding.
-
-
-numeric_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='mean')),  #  NaNs pela média
-    ('scaler', StandardScaler())  # padronizar
-])
-
-categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='most_frequent')),  # substituir NaNs pela moda
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))  #  one-Hot Encoding
-])
-
-# - Para variáveis numéricas, optamos por substituir valores ausentes pela média e padronizar os dados 
-# para melhorar o desempenho do modelo.
-# - Para variáveis categóricas, usamos a moda para substituir valores ausentes e aplicamos One-Hot 
-# Encoding para transformar categorias em variáveis binárias.
-
-# transformadores em um ColumnTransformer
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', numeric_transformer, numeric_features),
-        ('cat', categorical_transformer, categorical_features)
-    ])
-
-# - O `ColumnTransformer` combina os transformadores para variáveis numéricas e categóricas.
-# - Ele aplica as transformações corretas às colunas correspondentes automaticamente.
-
-# pipeline completo (pré-processamento + modelo)
-model = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('regressor', RandomForestRegressor(random_state=42))
-])
-
-# - O pipeline combina o pré-processamento (`preprocessor`) e o modelo de regressão (`RandomForestRegressor`).
-# - Isso garante que todas as transformações sejam aplicadas consistentemente durante o treinamento e a inferência.
-# - O `RandomForestRegressor` foi escolhido por sua robustez e capacidade de lidar com dados heterogêneos.
-
-# treino x teste
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# - Os dados são divididos em conjuntos de treino (80%) e teste (20%).
-# - A divisão aleatória é controlada pelo `random_state` para garantir reprodutibilidade.
+RANDOM_STATE = 42
+TEST_SIZE = 0.2
 
 
-# treinar modelo
-model.fit(X_train, y_train)
-# - O modelo é treinado com os dados de treino.
-# - O `fit` método é usado para ajustar os parâmetros do modelo para os dados de treino. 
-# - O modelo agora está pronto para fazer previsões com os dados de teste.
+def build_pipeline():
+    """Pre-processamento + Random Forest em um unico objeto."""
+    # Numericas: NaN pela media e padronizacao.
+    numeric_transformer = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="mean")),
+            ("scaler", StandardScaler()),
+        ]
+    )
 
-# previsões no conjunto de teste
-y_pred = model.predict(X_test)
-# calcular RMSE manualmente
-mse = mean_squared_error(y_test, y_pred) 
-rmse = np.sqrt(mse)  
-# exibir o RMSE
-print(f'RMSE: {rmse}')
+    # Categoricas: NaN pela moda e One-Hot Encoding.
+    categorical_transformer = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ]
+    )
 
-# - O RMSE (Root Mean Squared Error) é calculado para avaliar o desempenho do modelo.
-# - O RMSE mede a diferença média entre os valores previstos e reais, penalizando erros maiores.
+    # O ColumnTransformer aplica cada transformacao nas colunas certas.
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("num", numeric_transformer, NUMERIC_FEATURES),
+            ("cat", categorical_transformer, CATEGORICAL_FEATURES),
+        ]
+    )
 
-# salvar o modelo treinado em um arquivo .pkl
-with open('../model.pkl', 'wb') as f:
-    pickle.dump(model, f)
-print("Modelo treinado e salvo com sucesso!")
+    # Juntar pre-processamento e modelo garante que treino e inferencia
+    # apliquem exatamente as mesmas transformacoes.
+    # n_jobs=-1 usa todos os nucleos: o treino cai de minutos para segundos
+    # em maquinas com varios processadores.
+    return Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("regressor", RandomForestRegressor(random_state=RANDOM_STATE, n_jobs=-1)),
+        ]
+    )
 
-# - O modelo treinado é salvo em um arquivo `.pkl` usando o módulo `pickle`.
-# - Isso permite que o modelo seja carregado posteriormente para inferência sem precisar treiná-lo novamente.
+
+def main():
+    if not CSV_PATH.exists():
+        raise SystemExit(f"CSV nao encontrado: {CSV_PATH}")
+
+    df = pd.read_csv(CSV_PATH)
+    print(f"{len(df)} anuncios carregados de {CSV_PATH.name}")
+
+    X = df.drop(columns=DROP_COLUMNS)
+    y = df["price"]
+
+    # 80% treino / 20% teste, com semente fixa para o resultado ser reproduzivel.
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
+    )
+
+    model = build_pipeline()
+    print("Treinando...")
+    model.fit(X_train, y_train)
+
+    # O RMSE penaliza erros grandes; o MAE mostra o erro tipico em dolares e
+    # o R2 indica quanto da variacao do preco o modelo consegue explicar.
+    y_pred = model.predict(X_test)
+    print(f"RMSE: {root_mean_squared_error(y_test, y_pred):.2f}")
+    print(f"MAE:  {mean_absolute_error(y_test, y_pred):.2f}")
+    print(f"R2:   {r2_score(y_test, y_pred):.4f}")
+
+    with gzip.open(MODEL_PATH, "wb") as f:
+        pickle.dump(model, f)
+    print(f"Modelo salvo em {MODEL_PATH}")
+
+
+if __name__ == "__main__":
+    main()

@@ -2,20 +2,39 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask",
+            "name": "Flask: Indicium Price Predictor",
             "type": "debugpy",
             "request": "launch",
             "module": "flask",
+            "cwd": "${workspaceFolder}/app",
             "env": {
-                "FLASK_APP": "app.py", 
-                "FLASK_ENV": "development"
+                "FLASK_APP": "app.py",
+                "FLASK_DEBUG": "1"
             },
             "args": [
                 "run",
                 "--no-debugger",
                 "--reload"
             ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Python: app/app.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app/app.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
             "jinja": true
+        },
+        {
+            "name": "Python: treinar modelo",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/notebooks/treinamento_modelo.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
         }
     ]
 }
